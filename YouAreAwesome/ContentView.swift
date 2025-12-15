@@ -15,8 +15,10 @@ struct ContentView: View {
     @State private var lastImageNumber = -1
     @State private var lastSoundNumber = -1
     @State private var audioPlayer: AVAudioPlayer!
+    @State private var soundIsOn = true
     let numberOfImages = 10 // images labeled image0 - image9
     let numberOfSounds = 6 // sounds labeled sound0 - sound5
+    
     var body: some View {
         
         VStack {
@@ -37,8 +39,21 @@ struct ContentView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 30))
                 .shadow(radius: 30)
                 .animation(.default, value: message)
-            
-            Spacer()
+        }
+        
+        Spacer()
+        
+        HStack {
+            Text("Sound On:")
+            Toggle("", isOn: $soundIsOn)
+                .labelsHidden()
+                .onChange(of: soundIsOn) {
+                    if audioPlayer != nil {
+                        if audioPlayer.isPlaying {
+                            audioPlayer.stop()
+                        }
+                    }
+                }
             
             Button("Show Message"){
                 let messages = ["You are Awesome!",
@@ -56,11 +71,12 @@ struct ContentView: View {
                 imageName = "image\(lastImageNumber)"
                 
                 lastSoundNumber = nonRepeatingRandom(lastNumber: lastImageNumber, upperBound: numberOfSounds-1)
-                playSound(soundName: "sound\(lastSoundNumber)")
+                if soundIsOn {
+                    playSound(soundName: "sound\(lastSoundNumber)")
+                }
             }
             .buttonStyle(.borderedProminent)
             .font(.title2)
-            
         }
         .padding()
         
@@ -87,7 +103,6 @@ struct ContentView: View {
         }
     }
 }
-
 #Preview {
     ContentView()
 }
